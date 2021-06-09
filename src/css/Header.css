@@ -1,0 +1,51 @@
+.header-container {
+    padding: 5px;
+    border-radius: 10px;
+    background-color: var(--card-color);
+    box-shadow: var(--card-shadow);
+
+    display: flex;
+    justify-content: center;
+    
+    max-height: 25%;
+}
+
+.header-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.header-section p {
+    margin: 3px;
+    font-size: 0.9rem;
+}
+
+.header-container hr {
+    margin: 3px;
+    width: 90%;
+}
+
+.header-container h4 {
+    margin: 4px;
+}
+
+.section1 {
+    align-items: center;
+}
+.section1 img {
+    width: 80%;
+    height: 80%;
+}
+
+.header-events {
+    padding: 1%;
+    margin: 1%;
+    border: 1px solid var(--text);
+    background-color: var(--background);
+    flex: 1;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 90%;
+    font-weight: 600;
+}
+

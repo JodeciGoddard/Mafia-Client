@@ -1,0 +1,47 @@
+.al-container {
+    display: flex;
+    align-items: center;
+}
+
+.al-container > p {
+    background-color: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 3%;
+    max-width: 50%;
+    width: 50%;
+}
+
+.al-info {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.al-info svg {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.al-info p {
+    display: none;
+}
+
+.al-info:hover svg{
+    visibility: hidden;
+}
+
+.al-info:hover p {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: 200px;
+    background-color: #ffffff;
+    border: 1px solid var(--primary);
+    padding: 5px;
+}
+

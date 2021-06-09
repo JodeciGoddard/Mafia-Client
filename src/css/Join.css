@@ -1,0 +1,95 @@
+.join-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.join-container form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px;
+    box-shadow: var(--card-shadow);
+    width: 90%;
+    height: auto;
+    max-width: 300px;
+    min-height: 250px;
+
+    background-color: #ffffff;
+}
+
+.join-container label {
+    color: var(--primary);
+    font-weight: bold;
+    padding: 5px;
+}
+
+.join-container input {
+    outline: none;
+    border: 1px solid var(--text);
+    padding: 5px;
+    margin: 3px;
+    font-family: var(--primary-font);
+}
+
+.join-container input:focus {
+    border: 2px solid var(--primary);
+}
+
+.join-container button {
+    width: 40%;
+    padding: 3%;
+    font-size: 0.9rem;
+    align-self: center;
+
+    background-color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: var(--card-shadow);
+}
+
+.join-container button:active {
+    box-shadow: none;
+    background-color: #2698fb9c;
+}
+
+.join-container p {
+    margin: 0;
+    padding: 5px;
+}
+
+.join-rooms h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    padding: 3px;
+}
+
+.join-rooms hr {
+    margin: 0%;
+}
+
+.join-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.join-container tbody tr td {
+    padding: 5px;
+}
+
+.join-rooms tbody tr:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+.join-error {
+    align-self: center;
+    font-weight: bold;
+    color: rgb(219, 28, 14);
+}

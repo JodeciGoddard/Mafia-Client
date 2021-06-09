@@ -1,0 +1,28 @@
+.dropdown-container {
+    display: flex;
+    padding: 2%;
+    margin-top: 4%;
+    align-items: center;
+}
+
+.dropdown-container select {
+    border: 1px solid #2698fb63;
+    color: var(--primary);
+    margin: 1%;
+    padding: 3%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7rem;
+}
+
+.dropdown-container select:hover{
+    border: 1px solid var(--primary);
+}
+
+.dropdown-container select:focus{
+    outline: none;
+    border: 1px solid #1c87e4;
+}
+
+.dropdown-container label {
+    flex: 1;
+}

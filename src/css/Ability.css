@@ -1,0 +1,45 @@
+.ability-container {
+    display: flex;
+    margin-top: 3%;
+}
+
+.ability-container select, .ability-container button {
+    margin: 1%;
+    padding: 3%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7rem;
+}
+
+.ability-container select {
+    border: 1px solid #2698fb63;
+    color: var(--primary);
+}
+
+.ability-container select:hover{
+    border: 1px solid var(--primary);
+}
+
+.ability-container select:focus{
+    outline: none;
+    border: 1px solid #1c87e4;
+}
+
+.ability-container button {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    margin-left: 4%;
+
+    background-color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: var(--card-shadow);
+}
+
+.ability-container button:active {
+    box-shadow: none;
+    background-color: #2698fb9c;
+}
