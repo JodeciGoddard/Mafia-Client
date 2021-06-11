@@ -3,10 +3,14 @@ import '../css/Game.css';
 import Header from '../components/game-components/Header';
 import Main from '../components/game-components/Main';
 import profilePic from '../images/default.svg';
+import { useHistory } from 'react-router-dom';
+import VideoPlayer from '../components/VideoPlayer';
 
 const Game = ({ socket }) => {
 
     const [events, setEvents] = useState([{ message: "empty log" }]);
+    const [myStream, setMyStream] = useState(null);
+    let history = useHistory();
 
     const role = {
         image: profilePic,
@@ -40,15 +44,37 @@ const Game = ({ socket }) => {
         }
     ];
 
+    const getVideo = (myVideoRef) => {
+        navigator.mediaDevices
+            .getUserMedia({ video: { width: 300 }, audio: true })
+            .then(stream => {
+                let video = myVideoRef.current;
+                video.srcObject = stream;
+                video.muted = true;
+                video.play();
+            })
+            .catch(err => {
+                console.error("error:", err);
+            });
+    }
+
     useEffect(() => {
+        if (!socket) history.push("/");
+
+        console.log(socket);
+
         socket.on('user-connected', user => {
-            var ev = [...events];
-            console.log('current log: ', ev);
-            ev.push({ message: `${user} has joined` });
-            setEvents(ev);
+            printToConsole(`${user} has joined`);
             console.log("user has connected");
         });
-    }, [])
+
+
+    }, []);
+
+    const printToConsole = e => {
+        const ev = [...events, { message: e }];
+        setEvents(ev);
+    }
 
     return (
         <div className="game-container">
@@ -57,10 +83,14 @@ const Game = ({ socket }) => {
                 events={events}
             />
 
+
+
             <Main
                 role={role}
                 players={players}
-            />
+            >
+                <VideoPlayer myVideo getMyVideo={getVideo} />
+            </Main>
 
             <div className="testComp">
                 Test comp

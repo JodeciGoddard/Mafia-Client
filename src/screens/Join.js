@@ -30,7 +30,13 @@ const Join = ({ socket }) => {
             });
 
             socket.on('enter-room', roomId => {
-                history.push('/game/' + roomId.id);
+                history.push('/game/' + roomId);
+            })
+
+            socket.on('new-room-created', () => {
+                getRooms().then(data => {
+                    setGames(data);
+                })
             })
         }
 

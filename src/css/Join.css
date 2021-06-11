@@ -13,9 +13,9 @@
     justify-content: center;
     padding: 5px;
     box-shadow: var(--card-shadow);
-    width: 90%;
+    width: 60%;
     height: auto;
-    max-width: 300px;
+    
     min-height: 250px;
 
     background-color: #ffffff;

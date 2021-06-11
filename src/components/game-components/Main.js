@@ -4,7 +4,7 @@ import Ability from '../Ability';
 import RadioGroup from '../game-components/RadioGroup';
 import Dropdown from '../Dropdown';
 
-const Main = ({ role, players }) => {
+const Main = ({ role, players, children }) => {
     const [selectedTime, setSelectedTime] = useState("");
     const [selectedFormal, setSelectedFormal] = useState("");
     const [selectedChopping, setSelectedChopping] = useState("");
@@ -49,9 +49,9 @@ const Main = ({ role, players }) => {
             </div>
             <div className="main-section screen-section">
 
-                <div className="main-screen">
-                    <div className="main-screen-content">
-                        screen
+                <div className="main-screen" >
+                    <div className="main-screen-content" id="video-grid">
+                        {children}
                     </div>
                 </div>
 
