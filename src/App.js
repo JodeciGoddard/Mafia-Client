@@ -3,7 +3,8 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Game from './screens/Game';
 import { RecoilRoot } from 'recoil';
-import socket from './socket/MainSocket';
+import mainSocket from './socket/MainSocket';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -13,21 +14,20 @@ import Join from './screens/Join';
 
 function App() {
 
-  const [globalSocket, setGlobalSocket] = useState(null);
 
+  //manage a global socket
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('socket id: ' + socket.id);
-      setGlobalSocket(socket);
+    mainSocket.on('connect', () => {
+      console.log('socket id: ' + mainSocket.id);
+
     });
 
+
     return () => {
-      setGlobalSocket(null);
-      socket.disconnect();
+      mainSocket.disconnect();
     }
 
   }, []);
-
 
 
   return (
@@ -37,10 +37,10 @@ function App() {
           <Navbar />
           <Switch>
             <Route path="/" exact>
-              {globalSocket && <Join socket={globalSocket} />}
+              <Join socket={mainSocket} />
             </Route>
             <Route path="/game/:roomId">
-              <Game socket={globalSocket} />
+              <Game socket={mainSocket} />
             </Route>
           </Switch>
         </div>

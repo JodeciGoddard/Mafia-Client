@@ -3,14 +3,22 @@ import '../css/Game.css';
 import Header from '../components/game-components/Header';
 import Main from '../components/game-components/Main';
 import profilePic from '../images/default.svg';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import VideoPlayer from '../components/VideoPlayer';
+import { roomData, me } from '../State';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 const Game = ({ socket }) => {
 
     const [events, setEvents] = useState([{ message: "empty log" }]);
     const [myStream, setMyStream] = useState(null);
+
+    const [rdata, setRdata] = useRecoilState(roomData);
+    const user = useRecoilValue(me);
+
     let history = useHistory();
+
+    let { roomId } = useParams();
 
     const role = {
         image: profilePic,
@@ -61,15 +69,30 @@ const Game = ({ socket }) => {
     useEffect(() => {
         if (!socket) history.push("/");
 
-        console.log(socket);
+        socket.on('room-update', (room) => {
+            setRdata(room);
+            console.log("new room: ", room);
+        })
 
-        socket.on('user-connected', user => {
-            printToConsole(`${user} has joined`);
-            console.log("user has connected");
-        });
+        socket.emit('log', { roomId: roomId, msg: `${user.name} has joinded` });
+
 
 
     }, []);
+
+    useEffect(() => {
+        if (rdata) {
+            console.log("rdata: ", rdata);
+            let log = [];
+            for (const msg of rdata.log) {
+                let m = {
+                    message: msg
+                };
+                log.push(m);
+            }
+            setEvents(log);
+        }
+    }, [rdata])
 
     const printToConsole = e => {
         const ev = [...events, { message: e }];
@@ -87,7 +110,7 @@ const Game = ({ socket }) => {
 
             <Main
                 role={role}
-                players={players}
+                players={rdata.players}
             >
                 <VideoPlayer myVideo getMyVideo={getVideo} />
             </Main>

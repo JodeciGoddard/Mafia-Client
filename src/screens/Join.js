@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../css/Join.css';
 import { useHistory } from 'react-router-dom';
 import { getRooms } from '../util/fetch';
+import { roomData, me } from '../State';
+import { useSetRecoilState } from 'recoil';
 
 const Join = ({ socket }) => {
     const [username, setUsername] = useState("");
     const [roomId, setRoomId] = useState("");
     const [message, setMessage] = useState("");
     const [games, setGames] = useState([]);
+
+    //refs
+    const uname = useRef();
+
+    const setRoomData = useSetRecoilState(roomData);
+    const setUser = useSetRecoilState(me);
 
     let history = useHistory();
 
@@ -26,11 +34,16 @@ const Join = ({ socket }) => {
 
             socket.on('room-created', data => {
                 console.log("room created: ", data);
-                socket.emit('join-room', data.id, data.host);
+                socket.emit('join-room', data.id, uname.current.value);
             });
 
-            socket.on('enter-room', roomId => {
-                history.push('/game/' + roomId);
+            socket.on('enter-room', data => {
+                setRoomData(data);
+                setUser({
+                    id: socket.id,
+                    name: uname.current.value,
+                })
+                history.push('/game/' + data.id);
             })
 
             socket.on('new-room-created', () => {
@@ -83,7 +96,7 @@ const Join = ({ socket }) => {
 
             <form>
                 <label htmlFor="username">User Name</label>
-                <input id="username" name="username" type="text" value={username} onChange={update} autoComplete='off' />
+                <input id="username" ref={uname} name="username" type="text" value={username} onChange={update} autoComplete='off' />
                 <button onClick={handleCreate}>Create Room</button>
                 <label htmlFor="username">Room Id</label>
                 <input id="roomId" name="roomId" type="text" value={roomId} onChange={update} autoComplete='off' />
@@ -124,7 +137,7 @@ const Join = ({ socket }) => {
             </form>
 
 
-            <p>{socket.id ? "connected" : "waiting for connection"}</p>
+            <p>{socket && socket.id ? "connected" : "waiting for connection"}</p>
         </div>
 
     );

@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/Navbar.css';
 import { HiMenuAlt2 } from 'react-icons/hi';
 import { FaUser } from 'react-icons/fa';
 
+
 const Navbar = () => {
+
+
     return (
         <div className="nav-container">
             <div className="nav-begin">
