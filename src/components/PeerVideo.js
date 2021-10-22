@@ -10,10 +10,17 @@ const PeerVideo = ({ peer }) => {
         if (peer) {
 
             peer.on("stream", stream => {
-                ref.current.srcOject = stream;
-            })
 
-            console.log("streaming..");
+
+                if (ref.current) {
+                    ref.current.srcObject = stream;
+                    ref.current.muted = false;
+                    ref.current.play();
+                }
+
+                console.log("ref: ", ref);
+                console.log("streaming..", peer);
+            })
 
         }
 
@@ -21,7 +28,7 @@ const PeerVideo = ({ peer }) => {
 
     return (
         <div className="video-container">
-            <video ref={ref} playsInline autoPlay />
+            {ref ? <video ref={ref} playsInline autoPlay /> : 'no video'}
         </div>
     );
 }

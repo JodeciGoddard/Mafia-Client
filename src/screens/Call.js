@@ -23,53 +23,72 @@ const Call = ({ socket }) => {
 
         if (socket) {
 
-            if (id) {
-                //request the room info
-                socket.emit('get-room', id)
-            } else {
-                console.log("no room id found:", id);
-            }
+            navigator.mediaDevices
+                .getUserMedia({ video: { width: 300 }, audio: true })
+                .then(stream => {
+                    setMyStream(stream);
 
-            //recieve the room info
-            socket.on('sending-room', data => {
-                setRoom(data);
-                SetUsersInThisRoom(data.users);
+                    if (userVideo.current) {
+                        userVideo.current.srcObject = stream;
+                        userVideo.current.muted = true;
+                        userVideo.current.play();
+                    }
 
-                //console.log("room data:", data.users);
+                    if (id) {
+                        //request the room info
+                        socket.emit('get-room', id)
+                    } else {
+                        console.log("no room id found:", id);
+                    }
 
-                const peers = [];
-                data.users.forEach(user => {
-                    if (user.id == socket.id) return;
 
-                    const peer = createPeer(user.id, socket.id, myStream);
-                    peersRef.current.push({
-                        peerID: user.id,
-                        peer,
-                    });
-                    peers.push(peer);
-                    setPeers(peers);
+                    //recieve the room info
+                    socket.on('sending-room', data => {
+                        setRoom(data);
+                        SetUsersInThisRoom(data.users);
+
+
+                        const peers = [];
+                        data.users.forEach(user => {
+                            if (user.id == socket.id) return;
+
+                            const peer = createPeer(user.id, socket.id, stream);
+                            peersRef.current.push({
+                                peerID: user.id,
+                                peer,
+                            });
+                            peers.push(peer);
+                            setPeers(peers);
+                        })
+
+                    })
+
+                    socket.on("user joined", payload => {
+                        const peer = addPeer(payload.signal, payload.callerId, stream);
+                        peersRef.current.push({
+                            peerID: payload.callerId,
+                            peer: peer,
+                        })
+
+                        const newPeerArray = [...peers, peer];
+                        setPeers(newPeerArray);
+
+                        console.log('peer joined debug:', peer);
+                    })
+
+
+                    socket.on("receiving returned signal", payload => {
+                        const item = peersRef.current.find(p => p.peerID === payload.id);
+                        console.log('peer signal recieved: ', item);
+                        item.peer.signal(payload.signal);
+
+                    })
+
                 })
-            })
+                .catch(err => {
+                    console.error("error:", err);
+                });
 
-            socket.on("user joined", payload => {
-                const peer = addPeer(payload.signal, payload.callerId, payload.stream);
-                peersRef.current.push({
-                    peerID: payload.callerId,
-                    peer: peer,
-                })
-
-                const newPeerArray = [...peers, peer];
-                setPeers(newPeerArray);
-
-                console.log('peer joined debug:', peer);
-            })
-
-            socket.on("receiving returned signal", payload => {
-                const item = peersRef.current.find(p => p.peerID === payload.id);
-                console.log('peer signal recieved: ', item);
-                item.peer.signal(payload.signal);
-
-            })
 
         }
 
@@ -78,21 +97,7 @@ const Call = ({ socket }) => {
 
 
     function initialiseVideo() {
-        navigator.mediaDevices
-            .getUserMedia({ video: { width: 300 }, audio: true })
-            .then(stream => {
-                setMyStream(stream);
 
-                if (userVideo.current) {
-                    userVideo.current.srcObject = stream;
-                    userVideo.current.muted = true;
-                    userVideo.current.play();
-                }
-
-            })
-            .catch(err => {
-                console.error("error:", err);
-            });
     }
 
     function createPeer(userToSignal, callerId, stream) {
@@ -117,6 +122,8 @@ const Call = ({ socket }) => {
             trickle: false,
             stream: stream,
         })
+
+        console.log("this is the stream:", stream)
 
         peer.on("signal", signal => {
             socket.emit("returning signal", { signal, callerId })
