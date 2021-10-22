@@ -48,7 +48,7 @@ const Call = ({ socket }) => {
                         SetUsersInThisRoom(data.users);
 
 
-                        const peers = [];
+                        const localPeers = [];
                         data.users.forEach(user => {
                             if (user.id == socket.id) return;
 
@@ -57,9 +57,10 @@ const Call = ({ socket }) => {
                                 peerID: user.id,
                                 peer,
                             });
-                            peers.push(peer);
-                            setPeers(peers);
+                            localPeers.push(peer);
                         })
+
+                        setPeers(localPeers);
 
                     })
 
@@ -70,8 +71,9 @@ const Call = ({ socket }) => {
                             peer: peer,
                         })
 
-                        const newPeerArray = [...peers, peer];
-                        setPeers(newPeerArray);
+                        setPeers(peers => [...peers, peer]);
+
+                        // console.log('new array', newPeerArray);
 
                         console.log('peer joined debug:', peer);
                     })
@@ -151,6 +153,8 @@ const Call = ({ socket }) => {
 
                 )
             })}
+
+            <p>{peers.length}</p>
         </div>
 
     );
