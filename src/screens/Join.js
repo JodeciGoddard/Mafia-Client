@@ -9,7 +9,7 @@ const Join = ({ socket }) => {
     const [username, setUsername] = useState("");
     const [roomId, setRoomId] = useState("");
     const [message, setMessage] = useState("");
-    const [games, setGames] = useState([]);
+    const [games, setGames] = useState({});
 
     //refs
     const uname = useRef();
@@ -32,63 +32,56 @@ const Join = ({ socket }) => {
 
         if (socket) {
 
+            //request the rooms when components loads
+            socket.emit("get-rooms");
+
+            //list of rooms sent to this client
+            socket.on('sending-rooms', data => {
+                setGames(data)
+            })
+
+            //global notification new room was created
             socket.on('room-created', data => {
-                console.log("room created: ", data);
-                socket.emit('join-room', data.id, uname.current.value);
-            });
-
-            socket.on('enter-room', data => {
-                setRoomData(data);
-                setUser({
-                    id: socket.id,
-                    name: uname.current.value,
-                })
-                history.push('/game/' + data.id);
+                setGames(data)
+                console.log("new room created", data);
             })
 
-            socket.on('new-room-created', () => {
-                getRooms().then(data => {
-                    setGames(data);
-                })
+            //notification on the room this client created
+            socket.on('you-created-a-room', id => {
+                console.log("you created a new room: ", id)
+                if (uname.current.value !== "") {
+                    socket.emit('join-room', { roomId: id, username: uname.current.value })
+                    history.push('/game/' + id);
+                }
+
             })
+
+
+
         }
-
-        getRooms().then(data => {
-            setGames(data);
-        })
 
     }, []);
 
 
 
+
     const handleCreate = e => {
         e.preventDefault();
-        if (username.trim() === '') {
+        if (username.trim() !== '') {
+            socket.emit('create-room', { hostname: username });
+        } else {
             setMessage("Please enter a username");
-            return;
-        };
-        socket.emit("createRoom", { username: username });
-
+        }
     }
 
     const handleJoin = e => {
         e.preventDefault();
-        if (username.trim() === '') {
-            setMessage("Please enter a username");
-            return;
-        };
-        if (roomId.trim() === '') {
-            setMessage("Please enter a Room Id");
-            return;
-        };
-
-        socket.emit('join-room', roomId, username);
-
-        console.log('join clicked: ' + roomId, username);
+        socket.emit('join-room', { roomId: roomId, username: username })
+        history.push('/game/' + roomId);
     }
 
-    const handleGameSelect = g => {
-        setRoomId(g.id);
+    const handleGameSelect = id => {
+        setRoomId(id);
     }
 
     return (
@@ -115,14 +108,14 @@ const Join = ({ socket }) => {
 
                             </thead>
                             <tbody>
-                                {games.map((game, index) => {
+                                {games && Object.keys(games).map((id, index) => {
                                     return (
-                                        <tr key={index} onClick={(e) => handleGameSelect(game)}>
+                                        <tr key={index} onClick={(e) => handleGameSelect(id)}>
                                             <td>
-                                                {game.host}
+                                                {games[id].host}
                                             </td>
                                             <td>
-                                                {game.id}
+                                                {id}
                                             </td>
                                         </tr>
                                     )

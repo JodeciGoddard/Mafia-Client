@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../css/Game.css';
 import Header from '../components/game-components/Header';
 import Main from '../components/game-components/Main';
@@ -10,7 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 const Game = ({ socket }) => {
 
-    const [events, setEvents] = useState([{ message: "empty log" }]);
+    const [events, setEvents] = useState([]);
     const [myStream, setMyStream] = useState(null);
 
     const [rdata, setRdata] = useRecoilState(roomData);
@@ -19,6 +19,8 @@ const Game = ({ socket }) => {
     let history = useHistory();
 
     let { roomId } = useParams();
+
+    const userVideo = useRef();
 
     const role = {
         image: profilePic,
@@ -29,37 +31,21 @@ const Game = ({ socket }) => {
         abilities: [{ name: "Mafia Hit", desc: "See who the mafia hit is on", type: "day" }, { name: "Save", desc: "Save one person", type: "night" }, { name: "Poison", desc: "Kill one person at night", type: "day" }]
     }
 
-    const players = [
-        {
-            name: "John",
-            id: 56,
-            image: profilePic
-        },
-        {
-            name: "Sarah",
-            id: 22,
-            image: profilePic
-        },
-        {
-            name: "Liam",
-            id: 13,
-            image: profilePic
-        },
-        {
-            name: "Karen",
-            id: 91,
-            image: profilePic
-        }
-    ];
 
-    const getVideo = (myVideoRef) => {
+    const getVideo = () => {
         navigator.mediaDevices
             .getUserMedia({ video: { width: 300 }, audio: true })
             .then(stream => {
-                let video = myVideoRef.current;
-                video.srcObject = stream;
-                video.muted = true;
-                video.play();
+                setMyStream(stream);
+                // let video = myVideoRef.current;
+                if (userVideo.current) {
+                    userVideo.current.srcObject = stream;
+                    userVideo.current.muted = true;
+                    userVideo.current.play();
+                }
+                // video.srcObject = stream;
+                // video.muted = true;
+                // video.play();
             })
             .catch(err => {
                 console.error("error:", err);
@@ -69,30 +55,53 @@ const Game = ({ socket }) => {
     useEffect(() => {
         if (!socket) history.push("/");
 
+        getVideo();
+
         socket.on('room-update', (room) => {
             setRdata(room);
-            console.log("new room: ", room);
+            console.log("room update: ", room);
         })
 
-        socket.emit('log', { roomId: roomId, msg: `${user.name} has joinded` });
+        socket.on('allUsers', (users) => {
+            //get all the users???
+        });
 
+        socket.on('hey', (data) => {
+
+        })
 
 
     }, []);
+
+    function callPeer(id) {
+
+    }
+
+    function acceptCall() {
+
+    }
 
     useEffect(() => {
         if (rdata) {
             console.log("rdata: ", rdata);
             let log = [];
-            for (const msg of rdata.log) {
-                let m = {
-                    message: msg
-                };
-                log.push(m);
+            if (rdata.log) {
+                if (rdata.log.length == events.length) {
+                    setEvents(rdata.log);
+                    return
+                }
+                for (const msg of rdata.log) {
+                    let m = {
+                        message: msg
+                    };
+                    log.push(m);
+                }
+                setEvents(log);
             }
-            setEvents(log);
         }
     }, [rdata])
+
+
 
     const printToConsole = e => {
         const ev = [...events, { message: e }];
@@ -112,7 +121,7 @@ const Game = ({ socket }) => {
                 role={role}
                 players={rdata.players}
             >
-                <VideoPlayer myVideo getMyVideo={getVideo} />
+                <VideoPlayer videoRef={userVideo} />
             </Main>
 
             <div className="testComp">

@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import Navbar from './components/Navbar';
-import Game from './screens/Game';
 import { RecoilRoot } from 'recoil';
-import mainSocket from './socket/MainSocket';
+import socket from './socket/MainSocket';
+import Join from './screens/Join';
+import Call from './screens/Call';
 
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from 'react-router-dom';
-import Join from './screens/Join';
 
 function App() {
+
+  const [allUsers, setAllUser] = useState({});
 
 
   //manage a global socket
   useEffect(() => {
-    mainSocket.on('connect', () => {
-      console.log('socket id: ' + mainSocket.id);
 
-    });
+    socket.on('connect', () => {
+      console.log('socket id: ', socket.id);
+    })
 
 
     return () => {
-      mainSocket.disconnect();
+      socket.disconnect();
     }
 
   }, []);
@@ -34,15 +35,14 @@ function App() {
     <RecoilRoot>
       <Router>
         <div className="App">
-          <Navbar />
-          <Switch>
+          <switch>
             <Route path="/" exact>
-              <Join socket={mainSocket} />
+              <Join socket={socket} />
             </Route>
-            <Route path="/game/:roomId">
-              <Game socket={mainSocket} />
+            <Route path="/game/:id">
+              <Call socket={socket} />
             </Route>
-          </Switch>
+          </switch>
         </div>
       </Router>
 
