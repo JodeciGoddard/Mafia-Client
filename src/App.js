@@ -4,6 +4,7 @@ import { RecoilRoot } from 'recoil';
 import socket from './socket/MainSocket';
 import Join from './screens/Join';
 import Call from './screens/Call';
+import Login from './screens/Login';
 
 import {
   BrowserRouter as Router,
@@ -37,6 +38,9 @@ function App() {
         <div className="App">
           <switch>
             <Route path="/" exact>
+              <Login />
+            </Route>
+            <Route path="/join/:username" exact>
               <Join socket={socket} />
             </Route>
             <Route path="/game/:id">
