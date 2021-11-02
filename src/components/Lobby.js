@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../css/Lobby.css';
 
-const Lobby = ({ leave, lobby, isVisible }) => {
+const Lobby = ({ leave, lobby, isVisible, isAdmin, startGame }) => {
 
     const [classes, setClasses] = useState(" hidden")
 
@@ -34,7 +34,7 @@ const Lobby = ({ leave, lobby, isVisible }) => {
                 </div>
                 <div className="lobby-buttons">
                     <button onClick={leave}>Leave</button>
-                    <button>Start Game</button>
+                    {isAdmin && <button onClick={startGame}>Start Game</button>}
                 </div>
             </div>}
 

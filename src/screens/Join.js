@@ -11,6 +11,7 @@ const Join = ({ socket }) => {
 
     const [inLobby, setInLobby] = useState(false);
     const [lobbyData, setLobbyData] = useState({});
+    const [isAdmin, setIsAdmin] = useState(false);
 
     let history = useHistory();
 
@@ -72,11 +73,24 @@ const Join = ({ socket }) => {
         if (inLobby) {
             const lobby = games[lobbyData.lobbyId];
 
-            if (lobby) {
-                setLobbyData(lobby);
+            if (lobby !== null) {
+                // setLobbyData(lobby);
+                if (lobby.hostname == username) {
+                    setIsAdmin(true);
+                } else {
+                    setIsAdmin(false);
+                }
             }
         }
-    }, [games])
+    }, [inLobby])
+
+    useEffect(() => {
+        if (inLobby) {
+            if (lobbyData.lobbyId) {
+                setLobbyData(games[lobbyData.lobbyId]);
+            }
+        }
+    }, [games]);
 
 
 
@@ -105,10 +119,14 @@ const Join = ({ socket }) => {
         setLobbyData({});
     }
 
+    const startGame = () => {
+        socket.emit('start-game', lobbyId);
+    }
+
     return (
         <div className="join-container">
 
-            <Lobby leave={removeFromLobby} lobby={lobbyData} isVisible={inLobby} />
+            <Lobby startGame={startGame} isAdmin={isAdmin} leave={removeFromLobby} lobby={lobbyData} isVisible={inLobby} />
 
             <form>
                 <label htmlFor="">Room Name</label>

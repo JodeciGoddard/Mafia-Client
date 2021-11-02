@@ -8,6 +8,7 @@ const VideoPlayer = ({ videoRef }) => {
     return (
         <div className="video-container">
             <video ref={videoRef} playsInline autoPlay />
+
         </div>
     );
 }
