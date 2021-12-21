@@ -7,6 +7,7 @@ import Peer from 'simple-peer';
 const Call = ({ socket }) => {
 
     const [room, setRoom] = useState(null);
+    const [game, setGame] = useState(null);
     const [myStream, setMyStream] = useState(null);
     const [usersInThisRoom, SetUsersInThisRoom] = useState(null);
     const [peers, setPeers] = useState([]);
@@ -36,10 +37,47 @@ const Call = ({ socket }) => {
 
                     if (id) {
                         //request the room info
-                        socket.emit('get-room', id)
+                        socket.emit('get-game-info', id)
                     } else {
                         console.log("no room id found:", id);
                     }
+
+                    socket.on("sending-game", data => {
+                        console.log("game data", data);
+                        setGame(data);
+
+                        //get all user in town hall room
+                        let townhall;
+                        for (let rm of data.rooms) {
+                            if (rm.roomName == "town hall") {
+                                townhall = rm;
+                                break;
+                            }
+                        }
+
+                        const townhallUsers = [];
+                        for (let member of townhall.members) {
+                            townhallUsers.push(member.user)
+                        }
+
+                        SetUsersInThisRoom(townhallUsers);
+                        console.log("Current users: ", townhallUsers);
+
+                        const localPeers = [];
+                        townhallUsers.forEach(user => {
+                            if (user.userId == socket.id) return;
+
+                            const peer = createPeer(user.userId, socket.id, stream);
+                            peersRef.current.push({
+                                peerID: user.userId,
+                                peer,
+                            });
+                            localPeers.push(peer);
+                        })
+
+                        setPeers(localPeers);
+
+                    })
 
 
                     //recieve the room info
@@ -50,11 +88,11 @@ const Call = ({ socket }) => {
 
                         const localPeers = [];
                         data.users.forEach(user => {
-                            if (user.id == socket.id) return;
+                            if (user.userId == socket.id) return;
 
-                            const peer = createPeer(user.id, socket.id, stream);
+                            const peer = createPeer(user.userId, socket.id, stream);
                             peersRef.current.push({
-                                peerID: user.id,
+                                peerID: user.userId,
                                 peer,
                             });
                             localPeers.push(peer);

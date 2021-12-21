@@ -64,6 +64,10 @@ const Join = ({ socket }) => {
                 setInLobby(true);
             });
 
+            socket.on("join-game", gameId => {
+                history.push("/game/" + gameId);
+            })
+
 
         }
 
